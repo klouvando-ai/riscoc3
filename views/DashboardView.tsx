@@ -27,11 +27,9 @@ const DashboardView: React.FC = () => {
       d.setMonth(d.getMonth() - i);
       const monthName = d.toLocaleString('pt-BR', { month: 'short' });
       const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      
       const total = data.refs
         .filter(r => r.dataPedido.startsWith(monthKey))
         .reduce((acc, curr) => acc + (curr.comprimentoRisco || 0), 0);
-      
       months.push({ name: monthName, total });
     }
     return months;
@@ -44,7 +42,7 @@ const DashboardView: React.FC = () => {
     <div className="animate-fade-in">
       <div className="mb-10">
         <h1 className="text-3xl font-black text-gray-800 tracking-tight">Kavin's Dashboard</h1>
-        <p className="text-gray-500 font-medium uppercase text-xs tracking-widest">Controle Geral de Produtividade</p>
+        <p className="text-gray-500 font-medium uppercase text-xs tracking-widest">Resumo de Produtividade</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -55,18 +53,18 @@ const DashboardView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-          <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center space-x-2">
-            <span>📈</span> <span>Produtividade Mensal (Metragem Total)</span>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-8 flex items-center space-x-2">
+            <span>📈</span> <span>Produtividade Mensal (Metragem)</span>
           </h3>
-          <div className="flex items-end justify-between h-48 px-2 space-x-2">
+          <div className="flex items-end justify-between h-56 px-2 space-x-2">
             {monthlyStats.map((m, i) => (
-              <div key={i} className="flex flex-col items-center flex-1 group">
+              <div key={i} className="flex flex-col items-center flex-1 group relative">
                 <div 
-                  className="w-full bg-blue-500 rounded-t-md transition-all duration-500 hover:bg-blue-600 relative"
+                  className="w-full bg-blue-500 rounded-t-lg transition-all duration-500 hover:bg-blue-600"
                   style={{ height: `${(m.total / maxTotal) * 100}%`, minHeight: m.total > 0 ? '4px' : '0px' }}
                 >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap font-bold">
                     {m.total.toFixed(2)}m
                   </div>
                 </div>
@@ -77,23 +75,23 @@ const DashboardView: React.FC = () => {
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-800 mb-6">Status Operacional dos Riscos</h3>
-          <div className="space-y-4">
+          <h3 className="text-lg font-bold text-gray-800 mb-6">Distribuição de Status</h3>
+          <div className="space-y-5">
             {['Aguardando Rolo', 'Aguardando Risco', 'Risco Recebido', 'Pago'].map(status => {
               const count = data.refs.filter(r => r.status === status).length;
               const percent = (count / (data.refs.length || 1)) * 100;
               return (
                 <div key={status}>
-                  <div className="flex justify-between text-[10px] font-bold mb-1">
-                    <span className="text-gray-500 uppercase tracking-wider">{status}</span>
+                  <div className="flex justify-between text-[10px] font-bold mb-1.5 uppercase tracking-widest text-gray-500">
+                    <span>{status}</span>
                     <span className="text-gray-900">{count}</span>
                   </div>
-                  <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-700 ${
+                      className={`h-full transition-all duration-1000 ${
                         status === 'Pago' ? 'bg-green-500' : 
                         status === 'Risco Recebido' ? 'bg-blue-500' : 
-                        status === 'Aguardando Risco' ? 'bg-yellow-400' : 'bg-gray-400'
+                        status === 'Aguardando Risco' ? 'bg-yellow-400' : 'bg-gray-300'
                       }`}
                       style={{ width: `${percent}%` }}
                     ></div>
@@ -110,17 +108,14 @@ const DashboardView: React.FC = () => {
 
 const Card: React.FC<{ title: string, value: string | number, icon: string, color: string }> = ({ title, value, icon, color }) => {
   const colors: Record<string, string> = {
-    blue: 'border-blue-100 text-blue-600',
-    yellow: 'border-yellow-100 text-yellow-600',
-    green: 'border-green-100 text-green-600',
-    red: 'border-red-100 text-red-600',
+    blue: 'border-blue-500 text-blue-600',
+    yellow: 'border-yellow-400 text-yellow-600',
+    green: 'border-green-500 text-green-600',
+    red: 'border-red-500 text-red-600',
   };
-
   return (
-    <div className={`bg-white p-6 rounded-2xl shadow-sm border border-l-8 ${colors[color]} transition-transform hover:scale-[1.02]`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-2xl">{icon}</span>
-      </div>
+    <div className={`bg-white p-6 rounded-2xl shadow-sm border-l-8 ${colors[color]} transition-transform hover:scale-[1.02]`}>
+      <div className="text-2xl mb-2">{icon}</div>
       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</p>
       <p className="text-xl font-black text-gray-800 mt-1 truncate">{value}</p>
     </div>
