@@ -14,7 +14,7 @@ const FinanceView: React.FC = () => {
   }, []);
 
   const loadData = () => {
-    // Apenas riscos recebidos ou pagos aparecem no financeiro
+    // Only items that can have a price (received or paid)
     const allRefs = db.getReferencias().filter(r => r.status === 'Risco Recebido' || r.status === 'Pago');
     setRefs(allRefs);
     setModelistas(db.getModelistas());
@@ -52,29 +52,29 @@ const FinanceView: React.FC = () => {
     <div className="animate-fade-in">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Financeiro</h1>
-        <p className="text-gray-500">Controle de liquidação de riscos.</p>
+        <p className="text-gray-500 text-sm">Controle e liquidação de riscos recebidos.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Filtrado</p>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col items-center">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Selecionado</p>
           <p className="text-2xl font-black text-blue-600">R$ {totals.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-red-500">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Pendente (Aberto)</p>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 flex flex-col items-center">
+          <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Pendente (Em Aberto)</p>
           <p className="text-2xl font-black text-red-600">R$ {totals.aberto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Liquidado (Pago)</p>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-green-100 flex flex-col items-center">
+          <p className="text-[10px] font-black text-green-400 uppercase tracking-widest mb-1">Liquidado (Pago)</p>
           <p className="text-2xl font-black text-green-600">R$ {totals.pago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-wrap gap-4 items-end">
-        <div>
-          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Filtrar Modelista</label>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-wrap gap-6 items-end">
+        <div className="min-w-[200px]">
+          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 tracking-wider">Filtrar Modelista</label>
           <select 
-            className="px-4 py-2 border rounded-lg outline-none text-sm bg-gray-50 focus:bg-white"
+            className="w-full px-4 py-2.5 border rounded-xl outline-none text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all"
             value={filterModelista}
             onChange={(e) => setFilterModelista(e.target.value)}
           >
@@ -82,15 +82,15 @@ const FinanceView: React.FC = () => {
             {modelistas.map(m => <option key={m.id} value={m.id}>{m.nome}</option>)}
           </select>
         </div>
-        <div>
-          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Status</label>
-          <div className="flex bg-gray-100 p-1 rounded-lg">
+        <div className="min-w-[200px]">
+          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 tracking-wider">Filtrar Status</label>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
             {['Todos', 'Aberto', 'Pago'].map(s => (
               <button
                 key={s}
                 onClick={() => setFilterStatus(s)}
-                className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
-                  filterStatus === s ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                className={`flex-1 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                  filterStatus === s ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {s}
@@ -100,61 +100,74 @@ const FinanceView: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase">Recebimento</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase">Referência / Modelista</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase text-center">Metragens (Risco)</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase">Total</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase text-center">Status</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase text-right">Ação</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredRefs.map(r => {
-              const m = modelistas.find(mod => mod.id === r.modelistaId);
-              return (
-                <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-500">{r.dataRecebimento ? new Date(r.dataRecebimento).toLocaleDateString() : '-'}</td>
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-gray-800">{r.codigo}</p>
-                    <p className="text-[10px] text-gray-400 uppercase">{m?.nome}</p>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="font-mono font-bold text-blue-600">{r.comprimentoRisco?.toFixed(2)}m</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="font-black text-gray-800">R$ {r.valorTotal?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                    <p className="text-[9px] text-gray-400">V. Metro: R$ {m?.valorPorMetro.toFixed(2)}</p>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${
-                      r.status === 'Pago' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                      {r.status === 'Pago' ? 'LIQUIDADO' : 'EM ABERTO'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    {r.status === 'Risco Recebido' && (
-                      <button
-                        onClick={() => handlePay(r.id)}
-                        className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-black py-2 px-4 rounded-lg uppercase shadow-sm transition-all"
-                      >
-                        Pagar
-                      </button>
-                    )}
-                    {r.status === 'Pago' && <span className="text-[10px] text-gray-400 italic">Pago em {r.dataPagamento ? new Date(r.dataPagamento).toLocaleDateString() : ''}</span>}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider">Recebimento</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider">Referência / Modelista</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider text-center">Metragens (Risco)</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider text-right">Total</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider text-center">Status</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wider text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredRefs.map(r => {
+                const m = modelistas.find(mod => mod.id === r.modelistaId);
+                return (
+                  <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-xs font-medium text-gray-500">
+                      {r.dataRecebimento ? new Date(r.dataRecebimento).toLocaleDateString() : '-'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-gray-800">{r.codigo}</p>
+                      <p className="text-[10px] text-blue-500 font-bold uppercase">{m?.nome}</p>
+                    </td>
+                    <td className="px-6 py-4 text-center font-mono font-bold text-gray-700">
+                      {r.comprimentoRisco?.toFixed(2)}m
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <p className="font-black text-gray-900">R$ {r.valorTotal?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">R$ {m?.valorPorMetro.toFixed(2)} /m</p>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`px-2 py-1 rounded-full text-[9px] font-black uppercase inline-block min-w-[80px] ${
+                        r.status === 'Pago' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {r.status === 'Pago' ? 'LIQUIDADO' : 'PENDENTE'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {r.status === 'Risco Recebido' && (
+                        <button
+                          onClick={() => handlePay(r.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-black py-2 px-4 rounded-lg uppercase shadow hover:shadow-lg transition-all active:scale-[0.98]"
+                        >
+                          Pagar
+                        </button>
+                      )}
+                      {r.status === 'Pago' && (
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-green-600 font-bold uppercase">Pago em</span>
+                          <span className="text-[10px] text-gray-400">{r.dataPagamento ? new Date(r.dataPagamento).toLocaleDateString() : ''}</span>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredRefs.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic font-medium">
+                    Nenhum registro financeiro encontrado para estes filtros.
                   </td>
                 </tr>
-              );
-            })}
-            {filteredRefs.length === 0 && (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic">Nenhum registro encontrado para os filtros selecionados.</td></tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

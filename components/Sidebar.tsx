@@ -9,7 +9,7 @@ const Sidebar: React.FC<{ user: User, onLogout: () => void }> = ({ user, onLogou
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: '📊' },
     { path: '/modelistas', label: 'Modelistas', icon: '🧵' },
-    { path: '/referencias', label: 'Pedidos de Risco', icon: '📋' },
+    { path: '/referencias', label: 'Preferências / Riscos', icon: '📋' },
     { path: '/entrada-risco', label: 'Entrada de Risco', icon: '📥' },
     { path: '/financeiro', label: 'Financeiro', icon: '💰' },
     { path: '/relatorios', label: 'Relatórios', icon: '📄' },
@@ -22,7 +22,7 @@ const Sidebar: React.FC<{ user: User, onLogout: () => void }> = ({ user, onLogou
         <p className="text-xs text-gray-500 mt-1 uppercase font-bold">Controle de Produção</p>
       </div>
       
-      <nav className="flex-1 px-4 py-6 space-y-1">
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
         {menuItems.map((item) => (
           <Link
             key={item.path}
@@ -34,18 +34,18 @@ const Sidebar: React.FC<{ user: User, onLogout: () => void }> = ({ user, onLogou
             }`}
           >
             <span className="text-lg">{item.icon}</span>
-            <span className="font-medium">{item.label}</span>
+            <span className="font-medium text-sm">{item.label}</span>
           </Link>
         ))}
       </nav>
 
       <div className="p-6 border-t border-gray-800 bg-gray-900/50">
         <div className="flex items-center space-x-3 mb-4">
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-xs text-white">
             {user.username[0].toUpperCase()}
           </div>
-          <div>
-            <p className="text-sm font-bold text-white">{user.username}</p>
+          <div className="overflow-hidden">
+            <p className="text-sm font-bold text-white truncate">{user.username}</p>
             <p className="text-[10px] text-gray-500 uppercase tracking-tighter">{user.role}</p>
           </div>
         </div>
